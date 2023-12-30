@@ -57,4 +57,7 @@
     </ClCompile>
     <ClCompile Include="pch.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include=".clang-format" />
+  </ItemGroup>
 </Project>

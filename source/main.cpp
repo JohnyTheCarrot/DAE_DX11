@@ -6,6 +6,7 @@
 
 #undef main
 #include "Renderer.h"
+#include "Timer.h"
 
 using namespace dae;
 
