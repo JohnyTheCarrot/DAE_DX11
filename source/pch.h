@@ -22,3 +22,7 @@
 // Framework Headers
 #include "Timer.h"
 #include "Math.h"
+
+#if defined(DEBUG) | defined(_DEBUG)
+#define DEBUG_BUILD
+#endif

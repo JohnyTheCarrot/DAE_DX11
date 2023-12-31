@@ -16,6 +16,14 @@ namespace dae {
 		} else {
 			std::cout << "DirectX initialization failed!\n";
 		}
+
+		const std::vector<Vertex> vertices{
+				{{.0f, .5f, .5f}, {1.f, 0.f, 0.f}},
+				{{.5f, -.5f, .5f}, {0.f, 0.f, 1.f}},
+				{{-.5f, -.5f, .5f}, {0.f, 1.f, 0.f}},
+		};
+		const std::vector<uint32_t> indices{0, 1, 2};
+		m_Meshes[0] = Mesh(m_pDevice.get(), vertices, indices);
 	}
 
 	Renderer::~Renderer() {}
@@ -32,6 +40,7 @@ namespace dae {
 		);
 
 		// 2. Set pipeline + invoke draw calls (= render)
+		for (const auto &mesh : m_Meshes) mesh.Render(m_pDeviceContext.get());
 
 		// 3. Present backbuffer (swap)
 		std::ignore = m_pSwapChain->Present(0, 0);
@@ -48,8 +57,8 @@ namespace dae {
 		ID3D11Device *rpDevice{};
 
 		HRESULT result{D3D11CreateDevice(
-				nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags, &featureLevel, 1, D3D11_SDK_VERSION,
-				&rpDevice, nullptr, &rpDeviceContext
+				nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags, &featureLevel, 1,
+				D3D11_SDK_VERSION, &rpDevice, nullptr, &rpDeviceContext
 		)};
 		if (FAILED(result)) return result;
 
@@ -58,10 +67,12 @@ namespace dae {
 
 		// Create DXGI Factory
 		IDXGIFactory1 *rpDxgiFactory{};
-		result = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void **>(&rpDxgiFactory));
+		result = CreateDXGIFactory1(
+				__uuidof(IDXGIFactory1), reinterpret_cast<void **>(&rpDxgiFactory)
+		);
 		if (FAILED(result)) return result;
 
-		std::unique_ptr<IDXGIFactory1, DX11Deleter> pDxgiFactory{rpDxgiFactory};
+		DX11UniquePtr<IDXGIFactory1> pDxgiFactory{rpDxgiFactory};
 
 		//2. Create Swapchain
 		DXGI_SWAP_CHAIN_DESC swapChainDesc{};
@@ -130,15 +141,18 @@ namespace dae {
 
 		//Resource
 		ID3D11Resource *rpRenderTargetBuffer{};
-		result =
-				m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&rpRenderTargetBuffer));
+		result = m_pSwapChain->GetBuffer(
+				0, __uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&rpRenderTargetBuffer)
+		);
 		if (FAILED(result)) return result;
 
 		m_pRenderTargetBuffer.reset(rpRenderTargetBuffer);
 
 		//View
 		ID3D11RenderTargetView *rpRenderTargetView{};
-		result = m_pDevice->CreateRenderTargetView(m_pRenderTargetBuffer.get(), nullptr, &rpRenderTargetView);
+		result = m_pDevice->CreateRenderTargetView(
+				m_pRenderTargetBuffer.get(), nullptr, &rpRenderTargetView
+		);
 		if (FAILED(result)) return result;
 
 		m_pRenderTargetView.reset(rpRenderTargetView);

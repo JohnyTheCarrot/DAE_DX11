@@ -33,7 +33,7 @@ namespace dae
 
 	inline bool AreEqual(float a, float b, float epsilon = FLT_EPSILON)
 	{
-		return abs(a - b) < epsilon;
+		return std::abs(a - b) < epsilon;
 	}
 
 	inline int Clamp(const int v, int min, int max)
